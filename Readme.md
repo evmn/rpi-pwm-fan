@@ -8,7 +8,7 @@ Open database with `sqlite3`, and execute:
 select cpu_temp,fan_speed from cpu_temp;
 ```
 
-Copy data to `sample.txt`, then run `plot_date.py` to get data ploted.
+Copy data to `sample.txt`, then run `plot_data.py` to get data ploted.
 
 ![](plot.png)
 
