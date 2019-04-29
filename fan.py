@@ -14,7 +14,7 @@ PWM_FREQ = 25           # [Hz] Change this value if fan has strange behavior
 
 # Configurable temperature and fan speed steps
 tempSteps = [40, 50]    # [°C]
-speedSteps = [50, 100]   # [%]
+speedSteps = [50, 70]   # [%]
 
 # Fan speed will change only of the difference of temperature is higher than hysteresis
 hyst = 1
@@ -35,7 +35,7 @@ db = conn.cursor()
 db.execute('''
         create table if not exists cpu_temp
         (id integer primary key autoincrement,
-        datetime real,
+        datetime text,
         cpu_temp integer,
         fan_speed integer
         )
@@ -53,16 +53,16 @@ try:
         cpuTempFile.close()
         if(cpuTemp >= tempSteps[1]):
             fanSpeed = speedSteps[1]
-        if(cpuTemp < tempSteps[0]):
+        elif(cpuTemp < tempSteps[0]):
             fanSpeed = 0
-        if(fanSpeed != 0):
+        elif(fanSpeed != 0):
             fanSpeed = round((speedSteps[1]-speedSteps[0])\
                        /(tempSteps[1]-tempSteps[0])\
                        *(cpuTemp-tempSteps[0])\
                        +speedSteps[0],1)
         
-        print "CPU:", cpuTemp, "°C, fan running at ", fanSpeed
-        db.execute('''insert into cpu_temp(datetime, cpu_temp, fan_speed)values(julianday('now'),?,?)''', (cpuTemp, fanSpeed))
+        print "CPU:", cpuTemp, "°C. Fan speed:", fanSpeed
+        db.execute('''insert into cpu_temp(datetime, cpu_temp, fan_speed)values(datetime('now', 'localtime'),?,?)''', (cpuTemp, fanSpeed))
         conn.commit()
         if((fanSpeed != fanSpeedOld) ):
             if((fanSpeed >= FAN_MIN) or (fanSpeed == 0)):
